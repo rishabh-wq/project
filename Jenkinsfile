@@ -29,7 +29,7 @@ pipeline {
                         sh 'cat mytomcat_report.json | jq {summary}'
                         sh 'dockle --input ~/docker_img_backup/pgadmin4.tar -f json -o pgadmin4_report.json'
                         sh 'cat pgadmin4_report.json | jq {summary}'
-                        sh 'dockle --input ~/docker_img_backup/postgres11.6.tar -f json -o postgres11_report.json'
+                        sh 'dockle --input ~/docker_img_backup/postgres11.tar -f json -o postgres11_report.json'
                         sh 'cat postgres11_report.json | jq {summary}'
                         sh 'dockle --input ~/docker_img_backup/zap2docker-stable.tar -f json -o zap2docker-stable_report.json'
                         sh 'cat zap2docker-stable_report.json | jq {summary}'
