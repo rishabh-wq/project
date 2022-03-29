@@ -79,8 +79,8 @@ pipeline {
         }
         stage('DAST') {
             steps {
-                sh 'docker run --name dast_full --network project_project -t owasp/zap2docker-stable zap-full-scan.py -t http://mayur.cdac.project.com/LoginWebApp/ -J report_dast_full.json'
-                sh 'docker run --name dast_baseline --network project_project -v /root/:/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py -t http://mayur.cdac.project.com/LoginWebApp/ -J report.json --autooff'
+                sh 'docker run --name dast_full --network project_project -t owasp/zap2docker-stable zap-full-scan.py -t http://mayur.cdac.project.com/LoginWebApp/'
+                sh 'docker run --name dast_baseline --network project_project -t owasp/zap2docker-stable zap-baseline.py -t http://mayur.cdac.project.com/LoginWebApp/ --autooff'
             }
         }
     }
