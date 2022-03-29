@@ -49,9 +49,13 @@ pipeline {
         }
         stage('Initializing Docker') {
             steps {
+                sh 'docker stop postgres_container && docker rm postgres_container'
+                sh 'docker stop login && docker rm login'
+                sh 'docker stop pgadmin && docker rm pgadmin'
+                sh 'docker stop sonar_for_tomcat && docker rm sonar_for_tomcat'
                 sh 'docker-compose up -d'
                 sh 'docker build -t prod_tomcat .'
-                sh 'docker run --name login --rm  --network project_project -p 80:8080 -d prod_tomcat'
+                sh 'docker run --name login  --network project_project -p 80:8080 -d prod_tomcat'
                 sh 'docker run --name sonar_for_tomcat --rm --network project_project -p 4444:9000 -d owasp/sonarqube' 
             }
         }
