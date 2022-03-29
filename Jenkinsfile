@@ -65,16 +65,14 @@ pipeline {
             parallel {
                 stage('Dependency Check') {
                     steps {
-                        sh 'cd $WORKSPACE/project/'
-                        sh './DC.sh'
-                        sh 'cd $WORKSPACE/project/odc-reports/'
+                        sh 'wget https://github.com/mayur321886/project/blob/master/dc.sh'
+                        sh 'chmod +x dc.sh'
                         archive (includes: 'dependency-check-report.html')
                         archive (includes: 'dependency-check-report.html')
                     }
                 }
                 stage('Junit Testing') {
                     steps {
-                        sh 'cd $WORKSPACE/projects/odc-reports/'
                         archive (includes: 'dependency-check-junit.xml')
                     }
                 }
