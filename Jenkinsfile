@@ -51,6 +51,7 @@ pipeline {
             steps {
                 sh 'docker stop postgres_container && docker rm postgres_container || true'
                 sh 'docker stop login || true'
+                sh 'docker rm login || true'
                 sh 'docker stop pgadmin && docker rm pgadmin || true'
                 sh 'docker stop sonar_for_tomcat && docker rm sonar_for_tomcat || true'
                 sh 'docker-compose up -d'
