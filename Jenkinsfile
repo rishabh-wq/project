@@ -57,7 +57,7 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
-                sh 'mvn sonar:sonar -Dsonar.projectKey=mayur -Dsonar.host.url=http://localhost:4444 -Dsonar.login=2f3e1c66f6fc180a6df64adf6a5729c8e686e4af || true'
+                sh 'mvn sonar:sonar -Dsonar.projectKey=mayur -Dsonar.host.url=http://mayur.cdac.project.com:4444 -Dsonar.login=2f3e1c66f6fc180a6df64adf6a5729c8e686e4af || true'
             }
         }
         stage('SCA') {
@@ -79,8 +79,8 @@ pipeline {
         }
         stage('DAST') {
             steps {
-                sh 'docker run --name dast_full --network project_project -t owasp/zap2docker-stable zap-full-scan.py -t http://localhost/LoginWebApp/ -J report_dast_full.json'
-                sh 'docker run --name dast_baseline --network project_project -v /root/:/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py -t http://localhost/LoginWebApp/ -J report.json --autooff'
+                sh 'docker run --name dast_full --network project_project -t owasp/zap2docker-stable zap-full-scan.py -t http://mayur.cdac.project.com/LoginWebApp/ -J report_dast_full.json'
+                sh 'docker run --name dast_baseline --network project_project -v /root/:/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py -t http://mayur.cdac.project.com/LoginWebApp/ -J report.json --autooff'
             }
         }
     }
