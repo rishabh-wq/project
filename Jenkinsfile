@@ -16,7 +16,7 @@ pipeline {
                 stage('Git Repository Scanner'){
                     steps {
                         sh 'cd $WORKSPACE'
-                        sh 'trufflehog https://github.com/mayur321886/project --json | jq "{branch:.branch, commitHash:.commitHash, path:.path, stringsFound:.stringsFound}" > trufflehog.report || true'
+                        sh 'trufflehog https://github.com/mayur321886/project --json | jq "{branch:.branch, commitHash:.commitHash, path:.path, stringsFound:.stringsFound}" > trufflehog_report.json || true'
                         archiveArtifacts artifacts: 'trufflehog_report.json'
                         sh 'cat trufflehog_report.json'
                         sh 'echo "Scanning Repositories.....done"'
@@ -26,7 +26,7 @@ pipeline {
                     steps {
                         sh 'cd $WORKSPACE'
                         sh 'dockle --input ~/docker_img_backup/prod_tomcat.tar -f json -o mytomcat_report.json'
-                        sh 'cat prod_tomcat_report.json | jq {summary}'
+                        sh 'cat mytomcat_report.json | jq {summary}'
                         sh 'dockle --input ~/docker_img_backup/pgadmin4.tar -f json -o pgadmin4_report.json'
                         sh 'cat pgadmin4_report.json | jq {summary}'
                         sh 'dockle --input ~/docker_img_backup/postgres11.6.tar -f json -o postgres11_report.json'
