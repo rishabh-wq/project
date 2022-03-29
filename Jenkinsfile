@@ -49,7 +49,6 @@ pipeline {
         }
         stage('Initializing Docker') {
             steps {
-                sh 'cd $WORKSPACE/project/'
                 sh 'docker-compose up -d'
                 sh 'docker build -t prod_tomcat .'
                 sh 'docker run --name login --rm  --network project_project -p 80:8080 -d prod_tomcat'
