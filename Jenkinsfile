@@ -25,7 +25,7 @@ pipeline {
                 stage('Image Security') {
                     steps {
                         sh 'cd $WORKSPACE'
-                        sh 'dockle --input ~/docker_img_backup/prod_tomcat.tar -f json -o mytomcat_report.json'
+                        sh 'dockle --input ~/docker_img_backup/mytomcat.tar -f json -o mytomcat_report.json'
                         sh 'cat mytomcat_report.json | jq {summary}'
                         sh 'dockle --input ~/docker_img_backup/pgadmin4.tar -f json -o pgadmin4_report.json'
                         sh 'cat pgadmin4_report.json | jq {summary}'
