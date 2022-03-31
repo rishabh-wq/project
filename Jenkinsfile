@@ -2,13 +2,23 @@
 pipeline {
     agent any
     stages {
+        stage('Networking Configuration') {
+            steps {
+                sh 'docker network rm project_project || true'
+                sh 'docker container rm $(docker container ls -aq) || true' 
+            }
+        }
         stage('Install Dependencies') {
             steps {
                 sh 'cd $WORKSPACE'
-                sh 'rm -rf project || true'
                 git branch: "master",
                     url: "https://github.com/mayur321886/project"
                 sh 'ls'
+            }
+        }
+        post {
+            any {
+                sh 'rm -rf project || true' 
             }
         }
         stage('Pre-Build Tests') {
@@ -17,9 +27,24 @@ pipeline {
                     steps {
                         sh 'cd $WORKSPACE'
                         sh 'trufflehog https://github.com/mayur321886/project --json | jq "{branch:.branch, commitHash:.commitHash, path:.path, stringsFound:.stringsFound}" > trufflehog_report.json || true'
-                        archiveArtifacts artifacts: 'trufflehog_report.json'
                         sh 'cat trufflehog_report.json'
                         sh 'echo "Scanning Repositories.....done"'
+                    }
+                }
+                post {
+                    success {
+                        archiveArtifacts artifacts: 'trufflehog_report.json', onlyIfSuccessful: true
+                        emailext attachLog: true, attachmentsPattern: 'trufflehog_report.json', 
+                        body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}\n Thankyou,\n CDAC-Project Group-7", 
+                        subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME} - success", mimeType: 'text/html', to: "mayur321886@gmail.com"
+                    }
+                }
+                post {
+                    failure {
+                        archiveArtifacts artifacts: 'trufflehog_report.json', onlyIfSuccessful: true
+                        emailext attachLog: true, attachmentsPattern: 'trufflehog_report.json', 
+                        body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}\n Thankyou,\n CDAC-Project Group-7", 
+                        subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME} - failure", mimeType: 'text/html', to: "mayur321886@gmail.com"
                     }
                 }
                 stage('Image Security') {
@@ -38,6 +63,22 @@ pipeline {
                         archiveArtifacts artifacts: '*.json'
                     }
                 }
+                post {
+                    success {
+                        archiveArtifacts artifacts: '*.json', onlyIfSuccessful: true
+                        emailext attachLog: true, attachmentsPattern: '*.json', 
+                        body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}\n Please Find Attachments for the following:\n Thankyou\n CDAC-Project Group-7",
+                        subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - success", mimeType: 'text/html', to: "mayur321886@gmail.com"
+                    }
+                }
+                post {
+                    failure {
+                        archiveArtifacts artifacts: '*.json', onlyIfSuccessful: true
+                        emailext attachLog: true, attachmentsPattern: '*.json', 
+                        body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}\n Please Find Attachments for the following:\n Thankyou\n CDAC-Project Group-7",
+                        subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - failure", mimeType: 'text/html', to: "mayur321886@gmail.com" 
+                    }
+                }
             }
         }
         stage('Build Stage') {
@@ -53,16 +94,14 @@ pipeline {
                 sh 'docker stop login || true'
                 sh 'docker rm login || true'
                 sh 'docker stop pgadmin && docker rm pgadmin || true'
-                sh 'docker stop sonar_for_tomcat && docker rm sonar_for_tomcat || true'
                 sh 'docker-compose up -d'
                 sh 'docker build -t prod_tomcat .'
-                sh 'docker run --name login  --network project_project -p 80:8080 -d prod_tomcat'
-                sh 'docker run --name sonar_for_tomcat --network project_project -p 4444:9000 -d owasp/sonarqube'
+                sh 'docker run --name login  --network project_project -p 80:8080 -d prod_tomcat' 
             }
         }
         stage('SonarQube Analysis') {
             steps {
-                sh 'mvn sonar:sonar -Dsonar.projectKey=cdac -Dsonar.host.url=http://mayur.cdac.project.com:4444 -Dsonar.login=147f99ddd003e1a86dbcf3805256cec665c80aed || true'
+                sh ' || true'
             }
         }
         stage('SCA') {
@@ -72,24 +111,66 @@ pipeline {
                         sh 'wget https://github.com/mayur321886/project/blob/master/dc.sh'
                         sh 'chmod +x dc.sh'
                         sh './dc.sh'
-                        archiveArtifacts artifacts: 'odc-reports/*.html'
-                        archiveArtifacts artifacts: 'odc-reports/*.csv'
-                        archiveArtifacts artifacts: 'odc-reports/*.json'
+                    }
+                }
+                post {
+                    success {
+                        archiveArtifacts artifacts: 'odc-reports/*.html', onlyIfSuccessful: true
+                        archiveArtifacts artifacts: 'odc-reports/*.csv', onlyIfSuccessful: true
+                        archiveArtifacts artifacts: 'odc-reports/*.json', onlyIfSuccessful: true
+                        emailext attachLog: true, attachmentsPattern: '*.html', 
+                        body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}\n Please Find Attachments for the following:\n Thankyou\n CDAC-Project Group-7",
+                        subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - success", mimeType: 'text/html', to: "mayur321886@gmail.com"
+                }
+                post {
+                    failure {
+                        archiveArtifacts artifacts: 'odc-reports/*.html', onlyIfSuccessful: true
+                        archiveArtifacts artifacts: 'odc-reports/*.csv', onlyIfSuccessful: true
+                        archiveArtifacts artifacts: 'odc-reports/*.json', onlyIfSuccessful: true
+                        emailext attachLog: true, attachmentsPattern: '*.html', 
+                        body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}\n Please Find Attachments for the following:\n Thankyou\n CDAC-Project Group-7",
+                        subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - failure", mimeType: 'text/html', to: "mayur321886@gmail.com"
                     }
                 }
                 stage('Junit Testing') {
                     steps {
-                        archiveArtifacts artifacts: 'odc-reports/*.xml' 
+                        sh 'echo "Junit Reports are created using archiveArtifacts"'
+                    }
+                }
+                post {
+                    success {
+                        archiveArtifacts artifacts: '*junit.xml', onlyIfSuccessful: true
+                        emailext attachLog: true, attachmentsPattern: '*junit.xml', 
+                        body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}\n Please Find Attachments for the following:\n Thankyou\n CDAC-Project Group-7",
+                        subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - success", mimeType: 'text/html', to: "mayur321886@gmail.com"
+                    }
+                }
+                post {
+                    failure {
+                        archiveArtifacts artifacts: '*junit.xml', onlyIfSuccessful: true
+                        emailext attachLog: true, attachmentsPattern: '*junit.xml', 
+                        body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}\n Please Find Attachments for the following:\n Thankyou\n CDAC-Project Group-7",
+                        subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - failure", mimeType: 'text/html', to: "mayur321886@gmail.com"
                     }
                 }
             }
         }
         stage('DAST') {
             steps {
-                sh 'docker rm dast_full || true'
-                sh 'docker rm dast_baseline || true'
                 sh 'docker run --name dast_full --network project_project -t owasp/zap2docker-stable zap-full-scan.py -t http://mayur.cdac.project.com/LoginWebApp/ || true'
                 sh 'docker run --name dast_baseline --network project_project -t owasp/zap2docker-stable zap-baseline.py -t http://mayur.cdac.project.com/LoginWebApp/ --autooff || true'
+            }
+        }
+        post {
+            success {
+                sh 'docker rm dast_full'
+                sh 'docker rm dast_baseline'
+            }
+        }
+        post {
+            failure {
+                sh 'docker rm dast_baseline'
+                sh 'docker rm dast_full'
             }
         }
     }
