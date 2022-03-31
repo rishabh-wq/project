@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Networking Configuration') {
             steps {
-                sh 'docker network rm project_project || true'
+                sh 'docker network rm prod_project || true'
                 sh 'docker container rm $(docker container ls -aq) || true' 
             }
         }
@@ -67,7 +67,7 @@ pipeline {
                 sh 'docker stop pgadmin && docker rm pgadmin || true'
                 sh 'docker-compose up -d'
                 sh 'docker build -t prod_tomcat .'
-                sh 'docker run --name login  --network project_project -p 80:8080 -d prod_tomcat' 
+                sh 'docker run --name login  --network prod_project -p 80:8080 -d prod_tomcat' 
             }
         }
         stage('SonarQube Analysis') {
@@ -105,8 +105,8 @@ pipeline {
             steps {
                 sh 'docker rm dast_baseline'
                 sh 'docker rm dast_full'
-                sh 'docker run --name dast_full --network project_project -t owasp/zap2docker-stable zap-full-scan.py -t http://mayur.cdac.project.com/LoginWebApp/ || true'
-                sh 'docker run --name dast_baseline --network project_project -t owasp/zap2docker-stable zap-baseline.py -t http://mayur.cdac.project.com/LoginWebApp/ --autooff || true'
+                sh 'docker run --name dast_full --network prod_project -t owasp/zap2docker-stable zap-full-scan.py -t http://mayur.cdac.project.com/LoginWebApp/ || true'
+                sh 'docker run --name dast_baseline --network prod_project -t owasp/zap2docker-stable zap-baseline.py -t http://mayur.cdac.project.com/LoginWebApp/ --autooff || true'
             }
         }
     }
