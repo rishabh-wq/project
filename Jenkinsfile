@@ -72,12 +72,14 @@ pipeline {
                         sh 'wget https://github.com/mayur321886/project/blob/master/dc.sh'
                         sh 'chmod +x dc.sh'
                         sh './dc.sh'
+                        sh 'cd $WORKSACE/projects/odc-reports/'
                         archive (includes: 'dependency-check-report.html')
                         archive (includes: 'dependency-check-report.html')
                     }
                 }
                 stage('Junit Testing') {
                     steps {
+                        sh 'cd $WORKSPACE/projects/odc-reports/'
                         archive (includes: 'dependency-check-junit.xml')
                     }
                 }
