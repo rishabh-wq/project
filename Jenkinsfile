@@ -72,14 +72,14 @@ pipeline {
                         sh 'wget https://github.com/mayur321886/project/blob/master/dc.sh'
                         sh 'chmod +x dc.sh'
                         sh './dc.sh'
-                        archive (includes: 'dependency-check-report.html')
-                        archive (includes: 'dependency-check-report.json')
-                        archive (includes: 'dependency-check-report.csv')
+                        archiveArtifacts artifacts: '*.html'
+                        archiveArtifacts artifacts: '*.csv'
+                        archiveArtifacts artifacts: '*.json'
                     }
                 }
                 stage('Junit Testing') {
                     steps {
-                        archive (includes: 'dependency-check-junit.xml')
+                        archiveArtifacts artifacts: '*.xml' 
                     }
                 }
             }
