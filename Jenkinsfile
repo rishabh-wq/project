@@ -57,7 +57,7 @@ pipeline {
                 sh 'docker-compose up -d'
                 sh 'docker build -t prod_tomcat .'
                 sh 'docker run --name login  --network project_project -p 80:8080 -d prod_tomcat'
-                sh 'docker start sonar_for_tomcat'
+                sh 'docker run --name sonar_for_tomcat --network project_project -p 4444:9000 -d owasp/sonarqube'
             }
         }
         stage('SonarQube Analysis') {
