@@ -103,8 +103,8 @@ pipeline {
         }
         stage('DAST') {
             steps {
-                sh 'docker rm dast_baseline'
-                sh 'docker rm dast_full'
+                sh 'docker rm dast_baseline || true'
+                sh 'docker rm dast_full || true'
                 sh 'docker run --name dast_full --network prod_project -t owasp/zap2docker-stable zap-full-scan.py -t http://mayur.cdac.project.com/LoginWebApp/ || true'
                 sh 'docker run --name dast_baseline --network prod_project -t owasp/zap2docker-stable zap-baseline.py -t http://mayur.cdac.project.com/LoginWebApp/ --autooff || true'
             }
