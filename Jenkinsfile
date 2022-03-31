@@ -72,7 +72,7 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
-                sh ' || true'
+                sh 'mvn sonar:sonar -Dsonar.projectKey=cdac -Dsonar.host.url=http://192.168.10.137:4444 -Dsonar.login=dcce02acbf9019cdc6d338f50287f8178016fd6d || true'
             }
         }
         stage('SCA') {
