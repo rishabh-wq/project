@@ -73,7 +73,8 @@ pipeline {
                         sh 'chmod +x dc.sh'
                         sh './dc.sh'
                         archive (includes: 'dependency-check-report.html')
-                        archive (includes: 'dependency-check-report.html')
+                        archive (includes: 'dependency-check-report.json')
+                        archive (includes: 'dependency-check-report.csv')
                     }
                 }
                 stage('Junit Testing') {
