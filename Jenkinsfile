@@ -53,7 +53,7 @@ pipeline {
                 sh 'docker stop login || true'
                 sh 'docker rm login || true'
                 sh 'docker stop pgadmin && docker rm pgadmin || true'
-                sh 'docker stop sonar_for_tomcat || true'
+                sh 'docker stop sonar_for_tomcat && docker rm sonar_for_tomcat || true'
                 sh 'docker-compose up -d'
                 sh 'docker build -t prod_tomcat .'
                 sh 'docker run --name login  --network project_project -p 80:8080 -d prod_tomcat'
