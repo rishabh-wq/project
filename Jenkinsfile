@@ -13,7 +13,7 @@ pipeline {
                 sh 'cd $WORKSPACE'
                 sh 'rm -rf project'
                 git branch: "master",
-                    url: "https://github.com/mayur321886/project"
+                    url: "https://github.com/rishabh-wq/project"
                 sh 'ls'
             }
         }
@@ -79,7 +79,7 @@ pipeline {
             parallel {
                 stage('Dependency Check') {
                     steps {
-                        sh 'wget https://github.com/mayur321886/project/blob/master/dc.sh'
+                        sh 'wget https://github.com/rishabh-wq/project/blob/master/dc.sh'
                         sh 'chmod +x dc.sh'
                         sh './dc.sh'
                         archiveArtifacts artifacts: 'odc-reports/*.html', onlyIfSuccessful: true
@@ -105,8 +105,8 @@ pipeline {
             steps {
                 sh 'docker rm dast_baseline || true'
                 sh 'docker rm dast_full || true'
-                sh 'docker run --name dast_full --network prod_project -t owasp/zap2docker-stable zap-full-scan.py -t http://mayur.cdac.project.com/LoginWebApp/ || true'
-                sh 'docker run --name dast_baseline --network prod_project -t owasp/zap2docker-stable zap-baseline.py -t http://mayur.cdac.project.com/LoginWebApp/ --autooff || true'
+                sh 'docker run --name dast_full --network prod_project -t owasp/zap2docker-stable zap-full-scan.py -t http://rishabh.cdac.project.com/LoginWebApp/ || true'
+                sh 'docker run --name dast_baseline --network prod_project -t owasp/zap2docker-stable zap-baseline.py -t http://rishabh.cdac.project.com/LoginWebApp/ --autooff || true'
             }
         }
     }
